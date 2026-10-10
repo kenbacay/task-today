@@ -124,4 +124,13 @@ public string $savePath = 'C:/xampp/tmp';
      * seconds.
      */
     public int $lockMaxRetries = 300;
+    public function __construct()
+{
+    parent::__construct();
+
+    // Use a Linux-writable path on Render.
+    if (DIRECTORY_SEPARATOR === '/') {
+        $this->savePath = '/tmp/ci_sessions';
+    }
+}
 }
