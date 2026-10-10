@@ -23,7 +23,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set the project directory
 WORKDIR /var/www/html
 
-# Install PHP dependencies first
+# Install PHP dependencies
 COPY composer.json composer.lock* ./
 RUN composer install --no-dev --optimize-autoloader
 
@@ -39,8 +39,15 @@ RUN sed -ri \
     /etc/apache2/apache2.conf \
     /etc/apache2/conf-available/*.conf
 
-# Allow CodeIgniter to write sessions, cache, and logs
-RUN chown -R www-data:www-data /var/www/html/writable \
-    && chmod -R 775 /var/www/html/writable
+# Create writable folders for CodeIgniter sessions, cache, and logs
+RUN mkdir -p \
+        /var/www/html/writable/session \
+        /tmp/ci_sessions \
+    && chown -R www-data:www-data \
+        /var/www/html/writable \
+        /tmp/ci_sessions \
+    && chmod -R 775 \
+        /var/www/html/writable \
+        /tmp/ci_sessions
 
 EXPOSE 80
