@@ -4,6 +4,7 @@ namespace Config;
 
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Session\Handlers\BaseHandler;
+use CodeIgniter\Session\Handlers\DatabaseHandler;
 use CodeIgniter\Session\Handlers\FileHandler;
 
 class Session extends BaseConfig
@@ -22,7 +23,7 @@ class Session extends BaseConfig
      *
      * @var class-string<BaseHandler>
      */
-    public string $driver = FileHandler::class;
+    public string $driver = DatabaseHandler::class;
 
     /**
      * --------------------------------------------------------------------------
@@ -58,7 +59,8 @@ class Session extends BaseConfig
      *
      * IMPORTANT: You are REQUIRED to set a valid save path!
      */
-public string $savePath = 'C:/xampp/tmp';
+    public string $savePath = 'ci_sessions';
+
     /**
      * --------------------------------------------------------------------------
      * Session Match IP
@@ -67,7 +69,7 @@ public string $savePath = 'C:/xampp/tmp';
      * Whether to match the user's IP address when reading the session data.
      *
      * WARNING: If you're using the database driver, don't forget to update
-     *          your session table's PRIMARY KEY when changing this setting.
+     *          the session table's PRIMARY KEY when changing this setting.
      */
     public bool $matchIP = false;
 
@@ -98,7 +100,7 @@ public string $savePath = 'C:/xampp/tmp';
      *
      * DB Group for the database session.
      */
-    public ?string $DBGroup = null;
+    public ?string $DBGroup = 'default';
 
     /**
      * --------------------------------------------------------------------------
@@ -124,13 +126,4 @@ public string $savePath = 'C:/xampp/tmp';
      * seconds.
      */
     public int $lockMaxRetries = 300;
-    public function __construct()
-{
-    parent::__construct();
-
-    // Use a Linux-writable path on Render.
-    if (DIRECTORY_SEPARATOR === '/') {
-        $this->savePath = '/tmp/ci_sessions';
-    }
-}
 }
