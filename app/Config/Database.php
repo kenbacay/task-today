@@ -15,7 +15,8 @@ class Database extends Config
     public string $filesPath = APPPATH . 'Database' . DIRECTORY_SEPARATOR;
 
     /**
-     * Lets you choose which connection group to use if no other is specified.
+     * Lets you choose which connection group to use if no other connection
+     * group is specified.
      */
     public string $defaultGroup = 'default';
 
@@ -90,7 +91,6 @@ class Database extends Config
     //        'pConnect'   => false,
     //        'DBDebug'    => true,
     //        'charset'    => 'utf8',
-    //        'swapPre'    => '',
     //        'failover'   => [],
     //        'port'       => 5432,
     //        'dateFormat' => [
@@ -117,7 +117,6 @@ class Database extends Config
     //        'pConnect'   => false,
     //        'DBDebug'    => true,
     //        'charset'    => 'utf8',
-    //        'swapPre'    => '',
     //        'encrypt'    => false,
     //        'failover'   => [],
     //        'port'       => 1433,
@@ -134,7 +133,7 @@ class Database extends Config
     //     * You may need the following environment variables:
     //     *   NLS_LANG                = 'AMERICAN_AMERICA.UTF8'
     //     *   NLS_DATE_FORMAT         = 'YYYY-MM-DD HH24:MI:SS'
-    //     *   NLS_TIMESTAMP_FORMAT    = 'YYYY-MM-DD HH24:MI:SS'
+    //     *   NLS_TIMESTAMP_FORMAT   = 'YYYY-MM-DD HH24:MI:SS'
     //     *   NLS_TIMESTAMP_TZ_FORMAT = 'YYYY-MM-DD HH24:MI:SS'
     //     *
     //     * @var array<string, mixed>
@@ -148,7 +147,6 @@ class Database extends Config
     //        'pConnect'   => false,
     //        'DBDebug'    => true,
     //        'charset'    => 'AL32UTF8',
-    //        'swapPre'    => '',
     //        'failover'   => [],
     //        'dateFormat' => [
     //            'date'     => 'Y-m-d',
@@ -190,9 +188,68 @@ class Database extends Config
         ],
     ];
 
+    /**
+     * Load database settings from environment variables.
+     */
     public function __construct()
     {
         parent::__construct();
+
+        /*
+         * Render environment variables:
+         *
+         * DB_HOST
+         * DB_PORT
+         * DB_NAME
+         * DB_USER
+         * DB_PASSWORD
+         * DB_DRIVER
+         * DB_ENCRYPT
+         */
+
+        $this->default['hostname'] = env(
+            'DB_HOST',
+            env('database.default.hostname', $this->default['hostname'])
+        );
+
+        $this->default['port'] = (int) env(
+            'DB_PORT',
+            env('database.default.port', $this->default['port'])
+        );
+
+        $this->default['database'] = env(
+            'DB_NAME',
+            env('database.default.database', $this->default['database'])
+        );
+
+        $this->default['username'] = env(
+            'DB_USER',
+            env('database.default.username', $this->default['username'])
+        );
+
+        $this->default['password'] = env(
+            'DB_PASSWORD',
+            env('database.default.password', $this->default['password'])
+        );
+
+        $this->default['DBDriver'] = env(
+            'DB_DRIVER',
+            env('database.default.DBDriver', $this->default['DBDriver'])
+        );
+
+        $this->default['encrypt'] = filter_var(
+            env(
+                'DB_ENCRYPT',
+                env('database.default.encrypt', $this->default['encrypt'])
+            ),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        /*
+         * Show detailed database errors only in development.
+         * Hide sensitive database errors in production.
+         */
+        $this->default['DBDebug'] = ENVIRONMENT !== 'production';
 
         // Ensure that we always set the database group to 'tests' if
         // we are currently running an automated test suite, so that
